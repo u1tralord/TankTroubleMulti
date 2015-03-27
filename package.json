@@ -1,0 +1,12 @@
+{
+  "name": "Tank Trouble Multiplayer Online",
+  "version": "0.0.0",
+  "description": "Tank Trouble remake adding multiplayer online",
+  "main": "server.js",
+  "repository": "",
+  "author": "Jacob Poston <poston.jacob@gmail.com>",
+  "dependencies": {
+    "express": "~3.2.4",
+    "socket.io": "~1.3.5"
+  }
+}
