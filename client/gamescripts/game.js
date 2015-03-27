@@ -1,5 +1,6 @@
 var myID = 0;
-var socket = io.connect("https://tank-trouble-remake-u1tralord.c9.io");
+// socket = io.connect("https://tanktroublemultiplayer-u1tralord.c9.io/");
+var socket = io()
 
 socket.on("connected", function(data) {
     myID = data.id;
@@ -10,7 +11,7 @@ socket.on("count", function(data) {
 });
 
 
-var CANVAS_WIDTH = 640;
+var CANVAS_WIDTH = 720;
 var CANVAS_HEIGHT = 480;
 var FPS = 60;
 var updateRate = 60;
