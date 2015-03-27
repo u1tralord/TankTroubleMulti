@@ -1,0 +1,9 @@
+{
+    "updateRate":60,
+    "startPos":{
+        "x":50,
+        "y":50,
+        "dir":270
+    },
+    "dir":"/home/ubuntu/workspace/"
+}
