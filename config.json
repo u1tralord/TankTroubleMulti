@@ -1,5 +1,6 @@
 {
     "updateRate":60,
+    "pingRate":35,
     "startPos":{
         "x":50,
         "y":50,

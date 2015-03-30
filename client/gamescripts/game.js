@@ -1,21 +1,30 @@
 var myID = 0;
 // socket = io.connect("https://tanktroublemultiplayer-u1tralord.c9.io/");
-var socket = io()
+var socket = io();
 
-socket.on("connected", function(data) {
+socket.on("identify", function(data) {
     myID = data.id;
+    running = true;
 });
 
-socket.on("count", function(data) {
-    console.log(data.count);
+var enemyTanks = [];
+var serverBullets = [];
+
+socket.on("updateTanks", function(data) {
+    enemyTanks = data;
 });
 
+socket.on("newBullet", function(dataBullet) {
+    serverBullets.push(Bullet(dataBullet.xPos, dataBullet.yPos, dataBullet.dir)); 
+    console.log('New Bullet @ ' + dataBullet.xPos + ' ' + dataBullet.yPos +' '+ dataBullet.dir);
+});
 
 var CANVAS_WIDTH = 720;
 var CANVAS_HEIGHT = 480;
 var FPS = 60;
+var pingRate = 35;
 var updateRate = 60;
-var running = true;
+var running = false;
 var gameOverBool = false;
 var shadowAlpha = 0.1;
 var speed = 1;
@@ -30,11 +39,24 @@ setInterval(function() {
         update();
     }
 }, 1000 / updateRate);
+
+var lastPos = {xPos: 0, yPos: 0, dir: 0};
+setInterval(function() {
+    if (running) {
+        var newPos = {xPos: player.x, yPos: player.y, dir: player.dir};
+        if(newPos != lastPos)
+            socket.emit('tankPosUpdate', newPos);
+            
+        lastPos = newPos;
+    }
+}, 1000 / pingRate);
+
 setInterval(function() {
     if (running) {
         draw();
     }
 }, 1000 / FPS);
+
 setInterval(function() {
     if (keydown.space && !running){
 			reset();
@@ -56,7 +78,7 @@ var player = {
     yVelocity: 0.0,
     maxXSpeed: 10,
     maxYSpeed: 4,
-	maxBullets: 9999999,
+	maxBullets: 1000,
 	v1: {dir: 270, mag: 0},
     id: 0,
 	
@@ -127,6 +149,25 @@ var player = {
         };
     }
 };
+
+function drawTank(tank){
+    tank.width = 40;
+    tank.height = 30;
+    
+    tank.centerX = tank.xPos + tank.width/2;
+    tank.centerY = tank.yPos + tank.height/2;
+    
+    canvas.translate( tank.centerX, tank.centerY );
+	canvas.rotate(tank.dir * Math.PI / 180);
+	
+    canvas.fillStyle = "#ff0000";
+	canvas.fillRect(-1*tank.width/2, -1*tank.height/2, tank.width, tank.height);
+    canvas.fillRect(-1*tank.width/2+20, -1*tank.height/2+10, 25, 10);
+	
+	canvas.rotate(-1*tank.dir * Math.PI / 180);
+	canvas.translate( -1*tank.centerX, -1*tank.centerY );
+	canvas.restore();
+}
 
 function Bullet(_x, _y, _dir) {
     var I = {};
@@ -401,20 +442,13 @@ function update() {
 		player.dir = player.dir % 360;
     }
     if (keydown.up || keydown.w) {
-        //player.yVelocity += 1.3;
-        //player.yVelocity = player.yVelocity.clamp(-1*player.maxYSpeed, player.maxYSpeed);
-        socket.emit('keydown', {key: 'up'})
+        player.yVelocity += 1.3;
+        player.yVelocity = player.yVelocity.clamp(-1*player.maxYSpeed, player.maxYSpeed);
     }
 	if (keydown.down || keydown.s) {
         player.yVelocity -= 1.3;
 		player.yVelocity = player.yVelocity.clamp(-1*player.maxYSpeed, player.maxYSpeed);
     }
-    socket.emit('move_tank', { 
-        id: myID,
-        xPos: player.x,
-        yPos: player.y,
-        dir: player.dir
-    });
 
     if (keydown.space) {
         player.shoot();
@@ -441,6 +475,14 @@ function updateBullets() {
 	player.bullets.forEach(function(bullet) {
         bullet.update();
     });
+    
+     serverBullets = serverBullets.filter(function(bullet) {
+        return bullet.active;
+    });
+	
+	serverBullets.forEach(function(bullet) {
+        bullet.update();
+    });
 }
 
 function draw() {
@@ -453,6 +495,15 @@ function draw() {
 	
 	player.bullets.forEach(function(bullet) {
         bullet.draw();
+    });
+    
+    serverBullets.forEach(function(bullet) {
+        bullet.draw();
+    });
+    
+    enemyTanks.forEach(function(enemy) {
+        if(enemy.id != myID)
+            drawTank(enemy);
     });
 	
 	player.draw();
