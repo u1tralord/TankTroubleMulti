@@ -1,6 +1,33 @@
+
+
+html{
+    margin:0;
+    padding:0;
+}
+
+body{
+    margin: auto;
+    padding: 0;
+    width: 80%;
+    border-color: #000;
+    
+    font-family: Helvetica;
+    font-size: 12pt;
+    background-color: #141414;
+}
+
+
 #header{
+    background-color: #484846;
     width: 100%;
-    height: 50px;
+    height: 45px;
+    background: #141414;/*#1b2024;*/
+    padding: 0;
+}
+
+#footer{
+    width: 100%;
+    min-height: 50px;
     background: #1b2024;
 }
 
@@ -8,10 +35,37 @@
     margin: auto;
 }
 
-#footer{
-    width: 100%;
-    height: 50px;
-    background: #1b2024;
+#githubLink{
+    margin: 5px;
+    float: right;
+    vertical-align: bottom;
+    background-color: #202a2a;
+    border-radius: 5px;
+    padding: 5px;
+    position: relative;
+    bottom: 0;
+    
+    font-size: 12px;
+    font-family: Perpetua;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+}
+#githubLink:hover{
+    margin: 5px;
+    float: right;
+    vertical-align: bottom;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 5px;
+    position: relative;
+    bottom: 0;
+    
+    font-size: 12px;
+    font-family: Perpetua;
+    font-weight: bold;
+    text-decoration: none;
+    color: #202a2a;
 }
 
 .contentContainer{
@@ -19,13 +73,67 @@
     padding-top: 25px;
     padding-bottom: 25px;
     background-color: #232c31;
+    margin: auto;
 }
 
-body{
-    font-family: Helvetica;
-    font-size: 12pt;
-    background-color: #141414;
+#header-content{
+    background-color: #1c1c1c;
+    width: 100%;
     margin: auto;
-    width: 800;
-    height: 700;
+    overflow: auto;
+}
+
+#main-navBar{
+    height: 100%;
+    overflow: auto;
+}
+
+#navBar-list{
+    margin: 10px;
+    font-family: segoe-ui;
+    font-weight: lighter;
+}
+
+.navItem{
+    padding:5px;
+    padding-right: 15px;
+    padding-left: 15px;
+    display: inline;
+    border-right-width: 1px;
+    border-right-style: solid;
+}
+
+.navItem-active{
+    padding:5px;
+    padding-right: 15px;
+    padding-left: 15px;
+    display: inline;
+    border-right-width: 1px;
+    border-right-style: solid;
+}
+
+.navItem a{
+    font-size: 18px;
+    text-decoration: none;
+    color: #ddd6d4;
+}
+
+.navItem-active a{
+    border-top: 2px;
+    border-top-style: solid;
+    border-top-color: #aa0000;
+    
+    font-size: 18px;
+    text-decoration: none;
+    color: #ddd6d4;
+}
+
+.navItem a:hover{
+    text-decoration: none;
+    color: #fff;
+}
+
+.navItem-active a:hover{
+    text-decoration: none;
+    color: #fff;
 }

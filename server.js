@@ -28,7 +28,7 @@ io.sockets.on('connection', function (socket) {
   });
   
   socket.on('shoot', function(data) {
-      tank.shoot();
+      tank.shoot(data.xPos, data.yPos);
   });
   
   socket.on('disconnect', function() {
@@ -104,7 +104,7 @@ function getNewTank(x, y, dir, socket){
     I.velocity = 0;
     I.maxVelocity = 10;
     
-    I.shoot = function () {
+    I.shoot = function (bulletX, bulletY) {
         var canShoot = true;
 		
 		if(this.bullets.length > 0){
@@ -114,8 +114,8 @@ function getNewTank(x, y, dir, socket){
 		}
 				
 		if(canShoot){
-		    var bulletX = this.centerpoint().x;
-		    var bulletY = this.centerpoint().y;
+		    //var bulletX = this.centerpoint().x;
+		    //var bulletY = this.centerpoint().y;
 		    var newBullet = Bullet(bulletX, bulletY, this.dir);
 			this.bullets.push(newBullet);
 			
@@ -124,7 +124,7 @@ function getNewTank(x, y, dir, socket){
 			    yPos: bulletY,
 			    dir: this.dir
 			});
-			console.log('['+this.id+'] Shoots');
+			console.log('['+this.id+'] Shoots + ');
 			//console.log("["+this.id+"]SHOOTING!");
 		}
 		else{

@@ -15,7 +15,9 @@ socket.on("updateTanks", function(data) {
 });
 
 socket.on("newBullet", function(dataBullet) {
-    serverBullets.push(Bullet(dataBullet.xPos, dataBullet.yPos, dataBullet.dir)); 
+    var serverBullet = Bullet(dataBullet.xPos, dataBullet.yPos, dataBullet.dir);
+    serverBullet.color = "#00f";
+    serverBullets.push(serverBullet); 
     console.log('New Bullet @ ' + dataBullet.xPos + ' ' + dataBullet.yPos +' '+ dataBullet.dir);
 });
 
@@ -78,7 +80,7 @@ var player = {
     yVelocity: 0.0,
     maxXSpeed: 10,
     maxYSpeed: 4,
-	maxBullets: 1000,
+	maxBullets: 5,
 	v1: {dir: 270, mag: 0},
     id: 0,
 	
@@ -139,6 +141,11 @@ var player = {
 				
 		if(canShoot){
 			this.bullets.push(Bullet(this.midpoint().x, this.midpoint().y, this.dir));
+			socket.emit('shoot', { 
+                xPos: this.midpoint().x,
+                yPos: this.midpoint().y,
+                dir: this.dir
+            });
 		}
 	},
 
@@ -179,7 +186,7 @@ function Bullet(_x, _y, _dir) {
 	I.direction = _dir;
 	I.yVelocity = 4;
 	I.distanceTraveled = 0;
-	I.maxTravelDistance = 9999999;
+	I.maxTravelDistance = 1000;
 	
 	I.update = function(){
 		this.move();
@@ -452,9 +459,6 @@ function update() {
 
     if (keydown.space) {
         player.shoot();
-        socket.emit('shoot', { 
-            id: myID
-        });
     }
 	if (keydown.x) {
 		player.bullets.forEach(function(bullet) {
