@@ -2,8 +2,10 @@ var myID = 0;
 // socket = io.connect("https://tanktroublemultiplayer-u1tralord.c9.io/");
 var socket = io();
 
+var lastUpdateTime = 0;
 socket.on("identify", function(data) {
     myID = data.id;
+    lastUpdateTime = Date.now();
     running = true;
 });
 
@@ -12,13 +14,28 @@ var serverBullets = [];
 
 socket.on("updateTanks", function(data) {
     enemyTanks = data;
+    
+    /*
+    var serverBullets0 = [];
+    enemyTanks.forEach(function(enemy) {
+        enemy.bullets.forEach(function(enemyBullet){
+            enemyBullet.color = "#00f";
+            serverBullets0.push(enemyBullet);
+        });
+    });
+    serverBullets = serverBullets0;
+    */
 });
 
 socket.on("newBullet", function(dataBullet) {
     var serverBullet = Bullet(dataBullet.xPos, dataBullet.yPos, dataBullet.dir);
     serverBullet.color = "#00f";
-    serverBullets.push(serverBullet); 
-    console.log('New Bullet @ ' + dataBullet.xPos + ' ' + dataBullet.yPos +' '+ dataBullet.dir);
+    serverBullets.push(serverBullet);
+});
+
+socket.on('tankDeath', function(data) {
+   if(data.id == myID)
+    alert("Ya Got Shot!")
 });
 
 var CANVAS_WIDTH = 720;
@@ -188,14 +205,16 @@ function Bullet(_x, _y, _dir) {
 	I.distanceTraveled = 0;
 	I.maxTravelDistance = 1000;
 	
-	I.update = function(){
-		this.move();
+	I.update = function(timeDifference){
 		this.distanceTraveled+=this.yVelocity;
+		
 		if (this.distanceTraveled > this.maxTravelDistance)
 			this.active = false;
 		
 		if(this.x < 0 || this.x > CANVAS_WIDTH || this.y < 0 || this.y > CANVAS_HEIGHT)
 			this.bounce();
+			
+		this.move();
 	}
 	
 	I.bounce = function() {
@@ -469,6 +488,8 @@ function update() {
 	updateBullets();
     handleFriction();
     handleCollisions();
+    
+    lastUpdateTime = Date.now();
 }
 
 function updateBullets() {
@@ -477,7 +498,7 @@ function updateBullets() {
     });
 	
 	player.bullets.forEach(function(bullet) {
-        bullet.update();
+        bullet.update(0);
     });
     
      serverBullets = serverBullets.filter(function(bullet) {
@@ -485,7 +506,7 @@ function updateBullets() {
     });
 	
 	serverBullets.forEach(function(bullet) {
-        bullet.update();
+        bullet.update(0);
     });
 }
 

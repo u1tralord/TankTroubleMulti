@@ -51,8 +51,14 @@ function mainThread(){
     tanks.forEach(function(tank) {
         tank.bullets.forEach(function(bullet) {
             bullet.update();
-        })
-    })
+            tanks.forEach(function(tank1) {
+                /*if(checkBulletCollision(bullet, tank1)){
+                    broadcast('tankDeath', {id: tank1.id});
+                    bullet.active = false;
+                }*/
+            });
+        });
+    });
 }
 
 function pingThread(){
@@ -124,7 +130,7 @@ function getNewTank(x, y, dir, socket){
 			    yPos: bulletY,
 			    dir: this.dir
 			});
-			console.log('['+this.id+'] Shoots + ');
+			console.log('['+this.id+'] Shoots');
 			//console.log("["+this.id+"]SHOOTING!");
 		}
 		else{
@@ -218,8 +224,6 @@ function Vector(_x1, _y1, _x2, _y2) {
     var I = {};
 	I.vX = _x2 - _x1;
 	I.vY = _y2 - _y1;
-	I.dir = this.getAngle();
-	I.mag = this.getMagnitude();
 	
 	I.getAngle = function (){
 		var inRads = Math.atan2(this.vX, this.vY);
@@ -231,6 +235,9 @@ function Vector(_x1, _y1, _x2, _y2) {
 	I.getMagnitude = function(){
 		return Math.sqrt(Math.pow(this.vX, 2) + Math.pow(this.vY, 2));
 	}
+	
+	I.dir = this.getAngle();
+	I.mag = this.getMagnitude();
 	
 	I.set = function(I){
         I.vX = this.vY;
