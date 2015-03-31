@@ -85,6 +85,17 @@ setInterval(function() {
 	}
 }, 100);
 
+
+function getNewID(){
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
 var player = {
 	bullets: [],
     color: "#508494",
@@ -157,8 +168,9 @@ var player = {
 		}
 				
 		if(canShoot){
-			this.bullets.push(Bullet(this.midpoint().x, this.midpoint().y, this.dir));
+			//this.bullets.push(Bullet(this.midpoint().x, this.midoint().y, this.dir));
 			socket.emit('shoot', { 
+			    id: getNewID(),
                 xPos: this.midpoint().x,
                 yPos: this.midpoint().y,
                 dir: this.dir

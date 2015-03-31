@@ -52,10 +52,10 @@ function mainThread(){
         tank.bullets.forEach(function(bullet) {
             bullet.update();
             tanks.forEach(function(tank1) {
-                /*if(checkBulletCollision(bullet, tank1)){
+                if(checkBulletCollision(bullet, tank1)){
                     broadcast('tankDeath', {id: tank1.id});
                     bullet.active = false;
-                }*/
+                }
             });
         });
     });
@@ -130,7 +130,7 @@ function getNewTank(x, y, dir, socket){
 			    yPos: bulletY,
 			    dir: this.dir
 			});
-			console.log('['+this.id+'] Shoots');
+			//console.log('['+this.id+'] Shoots');
 			//console.log("["+this.id+"]SHOOTING!");
 		}
 		else{
@@ -167,53 +167,53 @@ function getNewTank(x, y, dir, socket){
 }
 
 function Bullet(_x, _y, _dir) {
-    var I = {};
-    I.active = true;
-    I.color = "#000000";
-    I.size = 10;
-    I.x = _x;
-    I.y = _y;
-	I.direction = _dir;
-	I.velocity = 4;
-	I.distanceTraveled = 0;
-	I.maxTravelDistance = 1000;
+    var bt = {};
+    bt.active = true;
+    bt.color = "#000000";
+    bt.size = 10;
+    bt.x = _x;
+    bt.y = _y;
+	bt.direction = _dir;
+	bt.velocity = 4;
+	bt.distanceTraveled = 0;
+	bt.maxTravelDistance = 1000;
 	
-	I.update = function(){
-		this.move();
-		this.distanceTraveled+=this.velocity;
-		if (this.distanceTraveled > this.maxTravelDistance)
-			this.active = false;
+	bt.update = function(){
+		bt.move();
+		bt.distanceTraveled+=bt.velocity;
+		if (bt.distanceTraveled > bt.maxTravelDistance)
+			bt.active = false;
 	}
 	
-	I.bounce = function() {
+	bt.bounce = function() {
 	    //TODO
 	}
 
-    I.centerpoint = function() {
+    bt.centerpoinbt = function() {
         return {
-            x: this.x + this.size / 2,
-            y: this.y + this.size / 2
+            x: bt.x + bt.size / 2,
+            y: bt.y + bt.size / 2
         };
     }
 
-    I.move = function() {
-        this.x += this.yVelocity * Math.cos(this.direction * Math.PI / 180);
-		this.y += this.yVelocity * Math.sin(this.direction * Math.PI / 180);
+    bt.move = function() {
+        bt.x += bt.yVelocity * Math.cos(bt.direction * Math.PI / 180);
+		bt.y += bt.yVelocity * Math.sin(bt.direction * Math.PI / 180);
     }
     
-    I.die = function(){
+    bt.die = function(){
         //TODO
     }
     
-    I.getPacketData = function() {
+    bt.getPacketData = function() {
         return {
-          xPos: this.x,
-          yPos: this.y,
-          dir: this.direction
+          xPos: bt.x,
+          yPos: bt.y,
+          dir: bt.direction
         };
     }
 
-    return I;
+    return bt;
 };
 
 function Vector2(dir, mag) {
@@ -221,81 +221,82 @@ function Vector2(dir, mag) {
 };
 
 function Vector(_x1, _y1, _x2, _y2) {
-    var I = {};
-	I.vX = _x2 - _x1;
-	I.vY = _y2 - _y1;
+    var v = {};
+	v.vX = _x2 - _x1;
+	v.vY = _y2 - _y1;
 	
-	I.getAngle = function (){
-		var inRads = Math.atan2(this.vX, this.vY);
+	v.getAngle = function (){
+		var inRads = Math.atan2(v.vX, v.vY);
 		/*if(inRads < 0)
 			inRads = 2*Math.PI + inRads;*/
 		return inRads * (180/Math.PI);
 	}
 
-	I.getMagnitude = function(){
-		return Math.sqrt(Math.pow(this.vX, 2) + Math.pow(this.vY, 2));
+	v.getMagnitude = function(){
+		return Math.sqrt(Math.pow(v.vX, 2) + Math.pow(v.vY, 2));
 	}
 	
-	I.dir = this.getAngle();
-	I.mag = this.getMagnitude();
+	v.dir = v.getAngle();
+	v.mag = v.getMagnitude();
 	
-	I.set = function(I){
-        I.vX = this.vY;
-        I.vY = this.vY;
-		I.dir = this.dir;
-        I.mag = this.mag;
+	v.set = function(I){
+        I.vX = v.vY;
+        I.vY = v.vY;
+		I.dir = v.dir;
+        I.mag = v.mag;
     }
 	
-	I.unitVector = function() {
-        return Vector(0, 0, this.vX/this.mag, this.vY/this.mag);
+	v.unitVector = function() {
+        return Vector(0, 0, v.vX/v.mag, v.vY/v.mag);
     }
 	
-	I.divide = function(scalar) {
-        return Vector(0, 0, this.vX/scalar, this.vY/scalar);
+	v.divide = function(scalar) {
+        return Vector(0, 0, v.vX/scalar, v.vY/scalar);
     }
 	
-	I.mulitply = function(scalar) {
-        return Vector(0, 0, this.vX*scalar, this.vY*scalar);
+	v.mulitply = function(scalar) {
+        return Vector(0, 0, v.vX*scalar, v.vY*scalar);
     }
 	
-	I.sum = function(vect) {
-        return Vector(0, 0, this.vX+vect.vX, this.vY+vect.vY);
+	v.sum = function(vect) {
+        return Vector(0, 0, v.vX+vect.vX, v.vY+vect.vY);
     }
 
-    I.diff = function(vect) {
-        return Vector(0, 0, this.vX-vect.vX, this.vY-vect.vY);
+    v.diff = function(vect) {
+        return Vector(0, 0, v.vX-vect.vX, v.vY-vect.vY);
     }
 
-    I.rotate = function(degrees) {
-        return Vector2(this.dir+degrees, this.mag);
+    v.rotate = function(degrees) {
+        return Vector2(v.dir+degrees, v.mag);
     }
 
-    I.setDir = function(degrees) {
-        return Vector2(this.degrees, this.mag);
+    v.setDir = function(degrees) {
+        return Vector2(v.degrees, v.mag);
     }
 	
-	I.setMagnitude = function(_mag){
-        this.mag = _mag;
-        this.vX = Math.cos(this.dir * (Math.PI/180)) * this.mag;
-        this.vY = Math.sin(this.dir * (Math.PI/180)) * this.mag;
+	v.setMagnitude = function(_mag){
+        v.mag = _mag;
+        v.vX = Math.cos(v.dir * (Math.PI/180)) * v.mag;
+        v.vY = Math.sin(v.dir * (Math.PI/180)) * v.mag;
 
     }
 
-    I.equals = function(vect){
-        return this.vX == vect.vX && this.vY == vect.vY;
+    v.equals = function(vect){
+        return v.vX == vect.vX && v.vY == vect.vY;
     }
 	
-	return I;
+	return v;
 }
 
 function checkBulletCollision(bullet,tank){//returns if there is a collision
     var bCenter = bullet.centerpoint();
     var tCenter = tank.centerpoint();
     var vector = Vector(bCenter.x,bCenter.y,tCenter.x,tCenter.y);
-    var bVector = vector.setMagnitude(bullet.size);
+    var bVector = Vector(bCenter.x,bCenter.y,tCenter.x,tCenter.y); bVector.setMagnitude(bullet.size);
     var tankMag = Vector(0,0,tank.width,tank.height).mag;
     var tankDisX = tankMag * Math.cos(180+tank.dir);
     var tankDisY = tankMag * Math.sin(tank.dir);
-     return (vector.vX<tankDisX+bVector.Vx && vector.vY<tankDisY+bVector.Vy);
+    console.log((vector.vX-(tankDisX+bVector.vX))+','+(vector.vY<(tankDisY-bVector.vY)))
+    return (vector.vX<tankDisX+bVector.vX && vector.vY<tankDisY+bVector.vY);
     
 }
