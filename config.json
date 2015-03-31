@@ -6,5 +6,9 @@
         "y":50,
         "dir":270
     },
+    "canvas":{
+        "height":480,
+        "width":720
+    },
     "dir":"/home/ubuntu/workspace/"
 }

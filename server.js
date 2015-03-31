@@ -52,7 +52,8 @@ function mainThread(){
         tank.bullets.forEach(function(bullet) {
             bullet.update();
             tanks.forEach(function(tank1) {
-                if(checkBulletCollision(bullet, tank1)){
+                if(!tank1.dead && checkBulletCollision(bullet, tank1)){
+                    tank1.die();
                     broadcast('tankDeath', {id: tank1.id});
                     bullet.active = false;
                 }
@@ -95,75 +96,77 @@ function getNewID(){
 }
 
 function getNewTank(x, y, dir, socket){
-    var I = {};
-    I.id = getNewID();
-    I.xPos = x;
-    I.yPos = y;
-    I.dir = dir;
-    I.socket = socket;
-    I.score = 0;
-    I.bullets = [];
-    I.maxBullets = 11111111111111111;
-    I.width=40;
-    I.height=30;
+    var t = {};
+    t.id = getNewID();
+    t.xPos = x;
+    t.yPos = y;
+    t.dir = dir;
+    t.socket = socket;
+    t.score = 0;
+    t.bullets = [];
+    t.maxBullets = 11111111111111111;
+    t.width=40;
+    t.height=30;
     
-    I.velocity = 0;
-    I.maxVelocity = 10;
+    t.velocity = 0;
+    t.maxVelocity = 10;
     
-    I.shoot = function (bulletX, bulletY) {
+    t.dead=false;
+    
+    t.shoot = function (bulletX, bulletY) {
         var canShoot = true;
 		
-		if(this.bullets.length > 0){
-			//console.log(getDistanceBetween(this.x, this.y, lastBullet.x, lastBullet.y));
-			var lastBullet = this.bullets[this.bullets.length-1];
-			canShoot = lastBullet.distanceTraveled > 40 && this.bullets.length < this.maxBullets;
+		if(t.bullets.length > 0){
+			//console.log(getDistanceBetween(t.x, t.y, lastBullet.x, lastBullet.y));
+			var lastBullet = t.bullets[t.bullets.length-1];
+			canShoot = lastBullet.distanceTraveled > 40 && t.bullets.length < t.maxBullets;
 		}
 				
 		if(canShoot){
-		    //var bulletX = this.centerpoint().x;
-		    //var bulletY = this.centerpoint().y;
-		    var newBullet = Bullet(bulletX, bulletY, this.dir);
-			this.bullets.push(newBullet);
+		    //var bulletX = t.centerpoint().x;
+		    //var bulletY = t.centerpoint().y;
+		    var newBullet = Bullet(bulletX, bulletY, t.dir);
+			t.bullets.push(newBullet);
 			
 			broadcast('newBullet', {
 			    xPos: bulletX,
 			    yPos: bulletY,
-			    dir: this.dir
+			    dir: t.dir
 			});
-			//console.log('['+this.id+'] Shoots');
-			//console.log("["+this.id+"]SHOOTING!");
+			//console.log('['+t.id+'] Shoots');
+			//console.log("["+t.id+"]SHOOTING!");
 		}
 		else{
 		    //console.log("TOO FAST!");
-		    //console.log(this.bullets.length +" "+ this.maxBullets);
+		    //console.log(t.bullets.length +" "+ t.maxBullets);
 		}
     }
     
-    I.centerpoint = function() {
+    t.centerpoint = function() {
         return {
-            x: this.x + this.width / 2,
-            y: this.y + this.height / 2
+            x: t.xPos + t.width / 2,
+            y: t.yPos + t.height / 2
         };
     }
     
-    I.setVelocity = function(){
-        this.velocity = this.velocity.clamp(-1*this.maxVelocity, this.maxVelocity);
+    t.setVelocity = function(){
+        t.velocity = t.velocity.clamp(-1*t.maxVelocity, t.maxVelocity);
     }
     
-    I.getPacketData = function(){
+    t.getPacketData = function(){
         return {
-          id: this.id,
-          xPos: this.xPos,
-          yPos: this.yPos,
-          dir: this.dir,
+          id: t.id,
+          xPos: t.xPos,
+          yPos: t.yPos,
+          dir: t.dir,
         };
     }
     
-    I.die = function(){
-        //TODO
+    t.die = function(){
+       t.dead=true;
     }
     
-    return I;
+    return t;
 }
 
 function Bullet(_x, _y, _dir) {
@@ -186,10 +189,16 @@ function Bullet(_x, _y, _dir) {
 	}
 	
 	bt.bounce = function() {
-	    //TODO
+	    if(bt.x<=0 || bt.y<=0 || bt.x>=config.canvas.width || bt.y>=config.canvas.height){
+	        if(bt.direction>=180){
+	            bt.direction-=180;
+	        }else{
+	            bt.direction+=180;
+	        }
+	    }
 	}
 
-    bt.centerpoinbt = function() {
+    bt.centerpoint = function() {
         return {
             x: bt.x + bt.size / 2,
             y: bt.y + bt.size / 2
@@ -197,8 +206,9 @@ function Bullet(_x, _y, _dir) {
     }
 
     bt.move = function() {
-        bt.x += bt.yVelocity * Math.cos(bt.direction * Math.PI / 180);
-		bt.y += bt.yVelocity * Math.sin(bt.direction * Math.PI / 180);
+        bt.bounce();
+        bt.x += bt.velocity * Math.cos(bt.direction * Math.PI / 180);
+		bt.y += bt.velocity * Math.sin(bt.direction * Math.PI / 180);
     }
     
     bt.die = function(){
@@ -240,10 +250,10 @@ function Vector(_x1, _y1, _x2, _y2) {
 	v.mag = v.getMagnitude();
 	
 	v.set = function(I){
-        I.vX = v.vY;
-        I.vY = v.vY;
-		I.dir = v.dir;
-        I.mag = v.mag;
+        v.vX = I.vY;
+        v.vY = I.vY;
+		v.dir = I.dir;
+        v.mag = I.mag;
     }
 	
 	v.unitVector = function() {
@@ -287,16 +297,16 @@ function Vector(_x1, _y1, _x2, _y2) {
 	
 	return v;
 }
-
+9
 function checkBulletCollision(bullet,tank){//returns if there is a collision
     var bCenter = bullet.centerpoint();
     var tCenter = tank.centerpoint();
     var vector = Vector(bCenter.x,bCenter.y,tCenter.x,tCenter.y);
     var bVector = Vector(bCenter.x,bCenter.y,tCenter.x,tCenter.y); bVector.setMagnitude(bullet.size);
     var tankMag = Vector(0,0,tank.width,tank.height).mag;
-    var tankDisX = tankMag * Math.cos(180+tank.dir);
-    var tankDisY = tankMag * Math.sin(tank.dir);
-    console.log((vector.vX-(tankDisX+bVector.vX))+','+(vector.vY<(tankDisY-bVector.vY)))
+    var tankDisX = Math.abs(tankMag * Math.cos(180+tank.dir));
+    var tankDisY = Math.abs(tankMag * Math.sin(tank.dir));
+    //console.log((vector.vX-(tankDisX+bVector.vX))+","+(vector.vY-(tankDisY+bVector.vY)));
     return (vector.vX<tankDisX+bVector.vX && vector.vY<tankDisY+bVector.vY);
     
 }

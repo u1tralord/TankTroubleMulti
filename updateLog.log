@@ -2,3 +2,4 @@
 [2015.03.30-15:54:04] - Git bash scipt updated to make a local log of commits
 [2015.03.30-23:56:23] - Added link to readme
 [2015.03.31-03:13:10] - Added collision detection
+[2015.03.31-13:10:25] - Removed usage of "this". Collisions are now functional

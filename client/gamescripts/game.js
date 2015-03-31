@@ -34,8 +34,12 @@ socket.on("newBullet", function(dataBullet) {
 });
 
 socket.on('tankDeath', function(data) {
-   if(data.id == myID)
-    alert("Ya Got Shot!")
+   if(data.id == myID){
+    alert("Ya Got Shot!");
+    console.log('shot');
+       
+   }
+    
 });
 
 var CANVAS_WIDTH = 720;
@@ -228,45 +232,16 @@ function Bullet(_x, _y, _dir) {
 			
 		this.move();
 	}
-	
-	I.bounce = function() {
-		var xVel = Math.cos(this.direction * Math.PI / 180);
-		var yVel = Math.sin(this.direction * Math.PI / 180);
-		
-		if(this.x < 0 || this.x > CANVAS_WIDTH)
-			xVel = -xVel;
-		else if(this.y < 0 || this.y > CANVAS_HEIGHT)
-			yVel = -yVel;
-		
-		var newDir = Math.atan2(xVel, yVel);
-		this.direction = newDir*(180/Math.PI);
-		/*if(this.direction >= 0 && this.direction < 90){
-			
-		}
-		else if(this.direction >= 90 && this.direction < 180){
-			
-		}
-		else if(this.direction >= 180 && this.direction < 270){
-			if(this.y < 0){
-				var diff = this.direction - 180;
-				this.direction = this.direction - 2*Math.abs(diff);
-			}
-			if(this.x < 0){
-				var diff = this.direction - 270;
-				this.direction = this.direction + 2*Math.abs(diff);
-			}
-		}
-		else if(this.direction >= 270 && this.direction < 360){
-			if(this.y < 0){
-				var diff = this.direction - 180;
-				this.direction = this.direction - 2*Math.abs(diff);
-			}
-			if(this.x < 0){
-				var diff = this.direction - 270;
-				this.direction = this.direction + 2*Math.abs(diff);
-			}
-		}*/
+		I.bounce = function() {
+	    if(I.x<=0 || I.y<=0 || I.x>=CANVAS_WIDTH || I.y>=CANVAS_HEIGHT){
+	        if(I.direction>=180){
+	            I.direction-=180;
+	        }else{
+	            I.direction+=180;
+	        }
+	    }
 	}
+	
 	
     I.draw = function() {
         canvas.fillStyle = this.color;
