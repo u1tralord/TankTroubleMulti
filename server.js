@@ -49,8 +49,8 @@ setInterval(function() {
 
 function mainThread(){
     tanks.forEach(function(tank) {
+        tank.update();
         tank.bullets.forEach(function(bullet) {
-            bullet.update();
             tanks.forEach(function(tank1) {
                 if(!tank1.dead && checkBulletCollision(bullet, tank1)){
                     tank1.die();
@@ -104,7 +104,7 @@ function getNewTank(x, y, dir, socket){
     t.socket = socket;
     t.score = 0;
     t.bullets = [];
-    t.maxBullets = 11111111111111111;
+    t.maxBullets = 5;
     t.width=40;
     t.height=30;
     
@@ -112,6 +112,26 @@ function getNewTank(x, y, dir, socket){
     t.maxVelocity = 10;
     
     t.dead=false;
+    t.timeDead = 0;
+    t.respawnTime = 35;
+    
+    t.update = function(){
+        if(t.dead)
+            t.timeDead++;
+        
+        t.bullets.forEach(function(bullet) {
+            bullet.update();
+        });
+        
+        if(t.timeDead > t.respawnTime){
+            t.respawn(50, 50);
+            broadcast('tankSpawn', {
+                id: t.id, 
+                xPos: 50,
+                yPos: 50,
+            });
+        }
+    }
     
     t.shoot = function (bulletX, bulletY) {
         var canShoot = true;
@@ -131,7 +151,8 @@ function getNewTank(x, y, dir, socket){
 			broadcast('newBullet', {
 			    xPos: bulletX,
 			    yPos: bulletY,
-			    dir: t.dir
+			    dir: t.dir,
+			    time: new Date().now
 			});
 			//console.log('['+t.id+'] Shoots');
 			//console.log("["+t.id+"]SHOOTING!");
@@ -164,6 +185,14 @@ function getNewTank(x, y, dir, socket){
     
     t.die = function(){
        t.dead=true;
+       t.xPos = -100;
+       t.yPos = -100;
+    }
+    
+    t.respawn = function(x, y){
+        t.dead=false;
+        t.xPos = x;
+        t.yPos = y;
     }
     
     return t;
@@ -217,9 +246,10 @@ function Bullet(_x, _y, _dir) {
     
     bt.getPacketData = function() {
         return {
-          xPos: bt.x,
-          yPos: bt.y,
-          dir: bt.direction
+            xPos: bt.x,
+    	    yPos: bt.y,
+    	    dir: bt.direction,
+    	    time: new Date().now
         };
     }
 

@@ -12,6 +12,8 @@ socket.on("identify", function(data) {
 var enemyTanks = [];
 var serverBullets = [];
 
+var deadTanks = [];
+
 socket.on("updateTanks", function(data) {
     enemyTanks = data;
     
@@ -35,11 +37,16 @@ socket.on("newBullet", function(dataBullet) {
 
 socket.on('tankDeath', function(data) {
    if(data.id == myID){
-    alert("Ya Got Shot!");
+    console.log("Ya Got Shot!");
     console.log('shot');
-       
+    deadTanks.push(data.id);
    }
     
+});
+
+socket.on('tankSpawn', function(data) {
+    if(data.id == myID)
+        console.log("You're alive!");
 });
 
 var CANVAS_WIDTH = 720;
@@ -50,7 +57,6 @@ var updateRate = 60;
 var running = false;
 var gameOverBool = false;
 var shadowAlpha = 0.1;
-var speed = 1;
 
 var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
     "' height='" + CANVAS_HEIGHT + "'></canvas>");

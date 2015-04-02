@@ -3,3 +3,4 @@
 [2015.03.30-23:56:23] - Added link to readme
 [2015.03.31-03:13:10] - Added collision detection
 [2015.03.31-13:10:25] - Removed usage of "this". Collisions are now functional
+[2015.04.02-15:45:24] - Collision is detected by the server now, but bullets are broken

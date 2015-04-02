@@ -8,4 +8,6 @@ git add .
 git commit -m "$desc" 
 git push origin master
 
+echo "----------------------------------------"
 echo "Git repository updated @ $current_time"
+echo "----------------------------------------"
